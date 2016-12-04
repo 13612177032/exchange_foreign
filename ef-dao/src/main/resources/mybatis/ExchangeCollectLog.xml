@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chale.ef.dao.ExchangeCollectLogDao">
+  <!-- 目的：为dao接口方法提供sql语句配置 -->
+
+  <resultMap id="ExchangeCollectLogMap" type="com.chale.ef.model.ExchangeCollectLog">
+    <result property="id" column="id"></result>
+    <result property="status" column="status"></result>
+    <result property="remark" column="remark"></result>
+    <result property="createTime" column="create_time"></result>
+   </resultMap>
+
+  <insert id="save" parameterType="com.chale.ef.model.ExchangeCollectLog"  useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO exchange_collect_log(status,remark,create_time)
+    VALUES (#{status},#{remark},#{createTime})
+  </insert>
+
+  <select id="getLatestLog" resultMap="ExchangeCollectLogMap">
+    select * FROM exchange_collect_log
+     <where>
+       <if test="status != null">
+         status = #{status}
+       </if>
+     </where>
+     ORDER BY create_time DESC limit 1
+  </select>
+
+  <update id="updateRemark" parameterType="com.chale.ef.model.ExchangeCollectLog">
+    UPDATE exchange_collect_log
+      <set>
+        <if test="status != null">
+          status = #{status},
+        </if>
+        <if test="remark != null">
+          remark = #{remark},
+        </if>
+      </set>
+      WHERE id = #{id}
+  </update>
+</mapper>

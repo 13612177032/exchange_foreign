@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chale.ef.dao.ExchangeOrderDao">
+  <!-- 目的：为dao接口方法提供sql语句配置 -->
+  <resultMap id="ExchangeOrderMap" type="com.chale.ef.model.ExchangeOrder">
+    <result property="id" column="id"></result>
+    <result property="orderId" column="order_id"></result>
+    <result property="userPin" column="user_pin"></result>
+    <result property="foreignAmount" column="foreign_amount"></result>
+    <result property="amount" column="amount"></result>
+    <result property="currency" column="currency"></result>
+    <result property="exchangeType" column="exchange_type"></result>
+    <result property="exchangeRate" column="exchange_rate"></result>
+    <result property="status" column="status"></result>
+    <result property="createTime" column="create_time" ></result>
+  </resultMap>
+
+  <resultMap id="CollectMap" type="com.chale.ef.common.bean.CollectResult">
+    <result property="exchangeType" column="exchange_type"></result>
+    <result property="allForeignAmount" column="all_foreign_amount"></result>
+    <result property="allMoney" column="all_amount"></result>
+  </resultMap>
+
+
+  <insert id="saveOrder" parameterType="com.chale.ef.model.ExchangeOrder">
+    INSERT INTO exchange_order(order_id,user_pin,foreign_amount,amount,exchange_rate,currency,exchange_type,status)
+    VALUES (#{orderId},#{userPin},#{foreignAmount},#{amount},#{exchangeRate},#{currency},#{exchangeType},#{status})
+  </insert>
+  <select id="queryByOrderId" resultMap="ExchangeOrderMap">
+    SELECT * FROM exchange_order where order_id = #{orderId}
+  </select>
+  <update id="update" parameterType="com.chale.ef.model.ExchangeOrder">
+    UPDATE exchange_order
+    <set>
+      <if test="status != null">
+        status = #{status}
+      </if>
+    </set>
+    WHERE order_id = #{orderId}
+  </update>
+  <select id="collect" parameterType="java.util.HashMap" resultMap="CollectMap">
+    SELECT exchange_type,SUM(foreign_amount) as all_foreign_amount,SUM(amount) as all_amount
+    FROM exchange_order
+    WHERE status = #{status} AND create_time BETWEEN #{beginTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP}
+    GROUP BY exchange_type
+  </select>
+
+</mapper>
