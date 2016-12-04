@@ -42,24 +42,29 @@ public class ExchangeServiceImpl implements ExchangeService{
     private ExchangeCollectLogDao exchangeCollectLogDao;
     @Override
     public SaleResonse sale(SaleRequest request) throws BusinessException{
+        //币种验证
         if(!CommonConstant.checkSupportCurrency(request.getForeignCurrency()))  throw new BusinessException(ExceptionEmnu.NOT_SUPPORT_CURRENCY);
+        //交易方式验证
         if(!CommonConstant.checkSupportExchangeType(request.getExchangeType()))  throw new BusinessException(ExceptionEmnu.NOT_SUPPORT_EXCHANGE_TYPE);
+        //金额准确性验证
         if(!checkMoney(request)) throw new BusinessException(ExceptionEmnu.MONEY_NOT_EQ);
-
+        //买入入库为负
+        BigDecimal fh=new BigDecimal(EXCHANGE_TYPE_BUY.equals(request.getExchangeType())?-1:1);
         ExchangeOrder order=new ExchangeOrder(
                 //多机部署需要更换订单号生成策略
                 IDProduceUtil.produceEfId(),
                 request.getUserPin(),
-                request.getAmount(),
                 //如果时买进则为负数
-                request.getForeignAmount().multiply(new BigDecimal(EXCHANGE_TYPE_BUY.equals(request.getExchangeType())?-1:1)),
+                request.getAmount().multiply(fh),
+                //如果时买进则为负数
+                request.getForeignAmount().multiply(fh),
                 request.getExchangeRate(),
                 request.getForeignCurrency(),
                 request.getExchangeType(),
                 ORDER_STATUS_SUBMIT
         );
         this.exchangeOrderDao.saveOrder(order);
-
+        //返回结果
         SaleResonse saleResponse=new SaleResonse();
         saleResponse.setOrderId(order.getOrderId());
         return saleResponse;
@@ -76,36 +81,39 @@ public class ExchangeServiceImpl implements ExchangeService{
         if(!ORDER_STATUS_SUBMIT.equals(order.getStatus()))  throw new BusinessException(ExceptionEmnu.RECALL_FAIL,"该订单状态已改变，无法撤销");
         //判断最后一次汇总时间
         ExchangeCollectLog log=this.exchangeCollectLogDao.getLatestLog(new HashMap<String,Object>());
+        //易产生汇总
         if(log!=null && log.getCreateTime().after(order.getCreateTime())) throw new BusinessException(ExceptionEmnu.RECALL_FAIL,"该订单易产生汇总");
-        //撤销
+        //撤销订单
         this.backOrder(request.getOrderId());
 
         return new BackResonse();
     }
 
-    private void backOrder(String orderId) {
-        ExchangeOrder order=new ExchangeOrder();
-        order.setOrderId(orderId);
-        order.setStatus(ORDER_STATUS_BACKD);
-        this.exchangeOrderDao.update(order);
-    }
+
 
     @Override
     public void collect() {
         Date collectTime=new Date();
 
-        //记录更新记录
+        //记录状态 --开始汇总
         ExchangeCollectLog log=new ExchangeCollectLog(COLLECT_STATUS_BEGIN);
         log.setCreateTime(collectTime);
-        ExchangeCollectLog latestCollect=this.exchangeCollectLogDao.getLatestLog(new HashMap<String, Object>(){{put("status",COLLECT_STATUS_SUCCESS);}});
+        this.exchangeCollectLogDao.save(log);
 
+        //查询上一次成功的时间
+        ExchangeCollectLog latestCollect=this.exchangeCollectLogDao.getLatestLog(new HashMap<String, Object>(){{put("status",COLLECT_STATUS_SUCCESS);}});
+        //为空从头开始查询
         Date beginDate=latestCollect!=null && latestCollect.getCreateTime()!=null?latestCollect.getCreateTime():new Date(0);
 
-        this.exchangeCollectLogDao.save(log);
+        //汇总结果
         List<CollectResult> results= this.collectAmount(beginDate,collectTime);
 
+        //TODO
+        //汇总结果暂以json存入
         log.setRemark(results==null || results.size()==0?"NULL":JSONObject.toJSONString(results));
         log.setStatus(COLLECT_STATUS_SUCCESS);
+
+        //更新状态
         this.exchangeCollectLogDao.updateRemark(log);
 
     }
@@ -120,5 +128,11 @@ public class ExchangeServiceImpl implements ExchangeService{
 
     private boolean checkMoney(SaleRequest request) {
         return request.getAmount().multiply(request.getExchangeRate()).compareTo(request.getForeignAmount())==0;
+    }
+    private void backOrder(String orderId) {
+        ExchangeOrder order=new ExchangeOrder();
+        order.setOrderId(orderId);
+        order.setStatus(ORDER_STATUS_BACKD);
+        this.exchangeOrderDao.update(order);
     }
 }

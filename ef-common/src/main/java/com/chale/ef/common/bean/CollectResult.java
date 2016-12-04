@@ -6,16 +6,16 @@ import java.math.BigDecimal;
  * Created by liangcl on 2016/12/3.
  */
 public class CollectResult {
-    private String exchangeType;
+    private String currency;
     private BigDecimal allForeignAmount;
     private BigDecimal allMoney;
 
-    public String getExchangeType() {
-        return exchangeType;
+    public String getCurrency() {
+        return currency;
     }
 
-    public void setExchangeType(String exchangeType) {
-        this.exchangeType = exchangeType;
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public BigDecimal getAllForeignAmount() {

@@ -16,7 +16,7 @@
   </resultMap>
 
   <resultMap id="CollectMap" type="com.chale.ef.common.bean.CollectResult">
-    <result property="exchangeType" column="exchange_type"></result>
+    <result property="currency" column="currency"></result>
     <result property="allForeignAmount" column="all_foreign_amount"></result>
     <result property="allMoney" column="all_amount"></result>
   </resultMap>
@@ -39,10 +39,10 @@
     WHERE order_id = #{orderId}
   </update>
   <select id="collect" parameterType="java.util.HashMap" resultMap="CollectMap">
-    SELECT exchange_type,SUM(foreign_amount) as all_foreign_amount,SUM(amount) as all_amount
+    SELECT currency,SUM(foreign_amount) as all_foreign_amount,SUM(amount) as all_amount
     FROM exchange_order
     WHERE status = #{status} AND create_time BETWEEN #{beginTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP}
-    GROUP BY exchange_type
+    GROUP BY currency
   </select>
 
 </mapper>

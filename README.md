@@ -58,7 +58,7 @@ CREATE TABLE `exchange_collect_log` (
                foreignAmount ：外币数量  
                foreignCurrency ：外币币种，目前仅支持USD,HKD  
                amount ：人民币金额  
-               exchangeRate ：汇率  
+               exchangeRate ：汇率 （外币/人民币）
                exchangeType ：交易类型 1：买进 2：售出  
     返回信息：
                    code: 1000未成功，其余为失败  
@@ -77,7 +77,8 @@ CREATE TABLE `exchange_collect_log` (
    1004, "金额计算不正确，请验证"  
    1005, "不支持该币种"  
    1006, "不支持该交易类型"  
-   9999, "系统异常"  
+   1006, "负值异常"
+   9999, "系统异常"
 
 ### 4.其它
 

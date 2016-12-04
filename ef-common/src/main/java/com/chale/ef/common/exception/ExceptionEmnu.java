@@ -13,6 +13,7 @@ public enum ExceptionEmnu {
     MONEY_NOT_EQ(1004, "金额计算不正确，请验证"),
     NOT_SUPPORT_CURRENCY(1005, "不支持该币种"),
     NOT_SUPPORT_EXCHANGE_TYPE(1006, "不支持该交易类型"),
+    MINUS_ERROR(1007, "金额，汇率不能为负"),
     SYSTEM_EXCEPTION(9999, "系统异常");
 
 

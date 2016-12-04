@@ -13,14 +13,30 @@ import java.util.Map;
  */
 @Repository
 public interface ExchangeOrderDao {
-
+    /**
+     * 保存订单
+     * @param order
+     */
     void saveOrder(ExchangeOrder order);
 
-
+    /**
+     * 根据订单号查询订单
+     * @param orderId
+     * @return
+     */
     ExchangeOrder queryByOrderId(String orderId);
 
+    /**
+     * 汇总信息
+     * @param map
+     * @return
+     */
     List<CollectResult> collect(Map<String,Object> map);
 
+    /**
+     * 更新订单
+     * @param orderId
+     */
     void update(ExchangeOrder orderId);
 
 }

@@ -15,6 +15,6 @@ public interface ExchangeService {
     SaleResonse sale(SaleRequest request) throws BusinessException;
     @Transactional
     BackResonse back(BackRequest request) throws BusinessException;
-
+    @Transactional
     void collect();
 }

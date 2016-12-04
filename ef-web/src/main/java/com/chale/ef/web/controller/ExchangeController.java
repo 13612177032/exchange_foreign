@@ -25,6 +25,12 @@ public class ExchangeController {
     @Autowired
     private ExchangeService exchangeService;
 
+    /**
+     * 销售接口
+     * @param request 订单信息
+     * @return 订单号
+     * @throws BusinessException
+     */
     @RequestMapping(value = "/sale.do",method = RequestMethod.POST)
     @ResponseBody
     public SaleResonse sale(SaleRequest request) throws BusinessException{
@@ -35,11 +41,19 @@ public class ExchangeController {
         checkNull(request.getExchangeType(),"兑换类型不能为空");
         checkNull(request.getForeignCurrency(),"外币类型不能为空");
         checkNull(request.getExchangeRate(),"汇率不能为空");
-
+        if(request.getAmount().doubleValue()<=0 ||
+           request.getForeignAmount().doubleValue()<=0||
+           request.getExchangeRate().doubleValue()<=0)
+            throw new BusinessException(ExceptionEmnu.MINUS_ERROR);
         return exchangeService.sale(request);
     }
 
-
+    /**
+     * 撤销接口
+     * @param request 订单号信息
+     * @return 撤销结果
+     * @throws BusinessException
+     */
     @RequestMapping(value = "/back.do")
     @ResponseBody
     public BackResonse sale(BackRequest request) throws BusinessException{
@@ -48,6 +62,12 @@ public class ExchangeController {
         return exchangeService.back(request);
     }
 
+    /**
+     * 空置判断
+     * @param v
+     * @param mes
+     * @throws BusinessException
+     */
     private void checkNull(Object v,String mes) throws BusinessException{
             if(v==null || "".equals(v)) throw new BusinessException(ExceptionEmnu.NULL,mes);
     }

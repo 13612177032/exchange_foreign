@@ -19,8 +19,16 @@ public interface ExchangeCollectLogDao {
      */
     ExchangeCollectLog getLatestLog(HashMap<String, Object> status);
 
-
+    /**
+     * 保存汇总日志
+     * @param log
+     * @return
+     */
     long save(ExchangeCollectLog log);
 
+    /**
+     * 更新汇总日志
+     * @param log
+     */
     void updateRemark(ExchangeCollectLog log);
 }
