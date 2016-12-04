@@ -19,7 +19,7 @@
 
 	<bean id="collectTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="collectJob" />
-		<property name="cronExpression" value="0 /1 * * * ?" /><!-- 每小时执行 -->
+		<property name="cronExpression" value="0 * /1 * * ?" /><!-- 每小时执行 -->
 	</bean>
 
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
