@@ -68,8 +68,8 @@ CREATE TABLE `exchange_collect_log` (
     接口地址： http://localhost:8080/foreign/back.do
             参数：      orderId ：订单号
             返回信息：
-                           code: 1000未成功，其余为失败
-                           msg:失败信息
+                   code: 1000未成功，其余为失败
+                   msg:失败信息
 *.附：错误码与错误信息对应
    1001, "验证失败"
    1002, "撤销失败"
